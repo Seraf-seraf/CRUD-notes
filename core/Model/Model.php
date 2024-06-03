@@ -63,8 +63,6 @@ abstract class Model
         $stmt = static::$db->prepare($sql);
         $params = array_merge(array_values($data), [$id]);
         $stmt->execute($params);
-
-        return static::find($id);
     }
 
     public static function delete($id)
@@ -74,7 +72,7 @@ abstract class Model
         }
         $sql = "DELETE FROM " . static::$table . " WHERE id = ?";
         $stmt = static::$db->prepare($sql);
-        return $stmt->execute([$id]);
+        $stmt->execute([$id]);
     }
 
     protected static function prepareData($data)

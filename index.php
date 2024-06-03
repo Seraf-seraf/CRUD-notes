@@ -1,9 +1,10 @@
 <?php
 require_once 'vendor/autoload.php';
+require_once 'helper/helper.php';
 
 use NotesApp\Database\Database;
 use NotesApp\Model\Post;
-use NotesApp\Model\User;
+use NotesApp\Controller\PostController;
 
 $db = Database::getInstance()
     ->connect(
@@ -12,28 +13,33 @@ $db = Database::getInstance()
         ''
     );
 Post::init();
-User::init();
-$post_1 = Post::create(['title' => 'Запись №1', 'note' => 'Тестовая запись']);
-$post_2 = Post::create(['title' => 'Запись №2', 'note' => 'Здесь кто-то был!']);
+$postController = new PostController();
 
-$posts = [$post_1, $post_2];
+$requestMethod = $_SERVER['REQUEST_METHOD'];
+$uri = $_SERVER['REQUEST_URI'];
 
-foreach ($posts as $post) {
-    echo $post->id . PHP_EOL;
-    echo $post->title . PHP_EOL;
-    echo $post->note . PHP_EOL;
-    echo $post->date_created . PHP_EOL . PHP_EOL;
+try {
+    if ($uri == '/index') {
+        $content = $postController->index();
+    } elseif($uri == '/create') {
+        $content = $postController->create();
+    } elseif (str_starts_with($uri, '/view/')) {
+        $array = explode('/', $uri);
+        $id = intval(end($array));
+        $content = $postController->view($id);
+    } elseif (str_starts_with($uri, '/update/')) {
+        $array = explode('/', $uri);
+        $id = intval(end($array));
+        $content = $postController->update($id);
+    } elseif (str_starts_with($uri, '/delete/')) {
+        $array = explode('/', $uri);
+        $id = intval(end($array));
+        $content = $postController->delete($id);
+    } else {
+        $content = $postController->index();
+    }
+} catch (Exception $exception) {
+    $content = $exception->getMessage();
 }
 
-$post = Post::find(30);
-echo $post->title;
-
-Post::update(['title' => 'Сломанная запись'], 30);
-Post::delete(30);
-
-$user = User::create([
-    'name' => 'Serafim',
-    'password' => password_hash('qwerty', PASSWORD_DEFAULT)
-]);
-
-var_dump(User::findAll());
+print render('core/View/layout.php', ['content' => $content]);
