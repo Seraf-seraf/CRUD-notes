@@ -1,0 +1,14 @@
+{
+  "name": "notesapp/v1",
+  "autoload": {
+    "psr-4": {
+      "NotesApp\\": "core/"
+    }
+  },
+  "authors": [
+    {
+      "name": "Seraf-seraf",
+      "email": "serafim123sima@mail.ru"
+    }
+  ]
+}
