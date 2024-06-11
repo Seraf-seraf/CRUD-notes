@@ -1,12 +1,14 @@
 <?php
+
 namespace NotesApp\Model;
 
 use Exception;
 use NotesApp\Database\Database;
-use \PDO;
+use PDO;
 
 abstract class Model
 {
+    public static array $fillable = [];
     protected static $db;
     protected static $table;
 
@@ -19,27 +21,53 @@ abstract class Model
     {
         $data = static::prepareData($data);
 
-        $sql = "INSERT INTO " . static::$table . " (" . implode(", ", array_keys($data)) . ") VALUES (" . mb_substr(str_repeat('?, ', count($data)), 0, -2) . ")";
+        $sql = "INSERT INTO " . static::$table . " (" . implode(", ", array_keys($data)) . ") VALUES (" . mb_substr(
+                str_repeat('?, ', count($data)),
+                0,
+                -2
+            ) . ")";
         $stmt = static::$db->prepare($sql);
         $stmt->execute(array_values($data));
 
         $id = static::$db->lastInsertId();
-        return static::find($id);
+        return static::find(['id' => $id]);
     }
 
-    public static function find($id)
+    protected static function prepareData($data)
     {
-        $sql = "SELECT * FROM " . static::$table . " WHERE id = ?";
-        $stmt = static::$db->prepare($sql);
-        $stmt->execute([$id]);
-
-        $result = $stmt->fetchObject(static::class);
-
-        if (!$result) {
-            throw new Exception('Model not found!');
+        foreach ($data as &$value) {
+            $value = htmlspecialchars($value);
         }
 
-        return  $result;
+        return $data;
+    }
+
+    protected static function getColumns()
+    {
+        $sql = "SHOW COLUMNS FROM " . static::$table;
+        $stmt = static::$db->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+    public static function find(array $data)
+    {
+        $condition = implode('AND ', static::getKeysWithMasks($data));
+
+        $sql = "SELECT * FROM " . static::$table . " WHERE {$condition}";
+        $stmt = static::$db->prepare($sql);
+        $stmt->execute(array_values($data));
+
+        return $stmt->fetchObject(static::class);
+    }
+
+    protected static function getKeysWithMasks($data)
+    {
+        $condition = [];
+        foreach ($data as $key => $value) {
+            $condition[] = "{$key} = ?";
+        }
+        return $condition;
     }
 
     public static function findAll()
@@ -52,13 +80,12 @@ abstract class Model
 
     public static function update(array $data, $id)
     {
-        if (!static::find($id)) {
+        if (!static::find(['id' => $id])) {
             throw new Exception('Model not found!');
         }
 
         $data = static::prepareData($data);
-
-        $setClause = implode(" = ?, ", array_keys($data)) . " = ?";
+        $setClause = implode(', ', static::getKeysWithMasks($data));
         $sql = "UPDATE " . static::$table . " SET " . $setClause . " WHERE id = ?";
         $stmt = static::$db->prepare($sql);
         $params = array_merge(array_values($data), [$id]);
@@ -75,10 +102,16 @@ abstract class Model
         $stmt->execute([$id]);
     }
 
-    protected static function prepareData($data)
+    public static function getValues()
     {
-        foreach ($data as &$value) {
-            $value = htmlspecialchars($value);
+        $fields = static::$fillable;
+        $data = [];
+
+        foreach ($fields as $field) {
+            if (!isset($_POST[$field])) {
+                throw new \InvalidArgumentException("Попытка сохранить несуществующий атрибут " . static::class);
+            }
+            $data[$field] = htmlspecialchars($_POST[$field]);
         }
 
         return $data;

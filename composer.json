@@ -10,5 +10,8 @@
       "name": "Seraf-seraf",
       "email": "serafim123sima@mail.ru"
     }
-  ]
+  ],
+  "require": {
+    "altorouter/altorouter": "1.1.0"
+  }
 }

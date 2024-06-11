@@ -1,5 +1,7 @@
 <?php
-function render($template_file, $data = []) {
+
+function render($template_file, $data = [])
+{
     if (!file_exists($template_file)) {
         throw new Exception('Template not found');
     }
@@ -9,4 +11,12 @@ function render($template_file, $data = []) {
     include $template_file;
 
     return ob_get_clean();
+}
+
+function getAuth()
+{
+    if (!isset($_SESSION['user_id'])) {
+        header('Location: /login');
+        die();
+    }
 }

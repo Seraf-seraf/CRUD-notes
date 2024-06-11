@@ -1,11 +1,13 @@
-<form action="/update/<?=$post->id?>" method="post">
+<form action="/create" method="post">
+    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token']; ?>">
+
     <div class="form-field mb-3">
         <label for="title" class="form-label">Заголовок</label>
-        <input id="title" class="form-control" type="text" name="title" value="<?=$post->title;?>" placeholder="Заголовок">
+        <input id="title" class="form-control" type="text" name="title" placeholder="Заголовок">
     </div>
     <div class="form-field mb-3">
         <label for="note" class="form-label">Заметка</label>
-        <input id="note" class="form-control" type="text" name="note" value="<?=$post->note;?>" placeholder="Заметка">
+        <input id="note" class="form-control" type="text" name="note" placeholder="Заметка">
     </div>
 
     <input class="btn btn-primary rounded-pill px-3" type="submit" value="Сохранить">

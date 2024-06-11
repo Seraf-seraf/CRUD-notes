@@ -4,17 +4,16 @@ namespace NotesApp\Model;
 
 use NotesApp\Database\Database;
 
-class Post extends Model
+class User extends Model
 {
     public static array $fillable = [
-        'title',
-        'note'
+        'login',
+        'password'
     ];
-    protected static $table = 'post';
+    protected static $table = 'user';
 
     public function __construct()
     {
         static::$db = Database::getInstance()->db;
     }
-
 }
