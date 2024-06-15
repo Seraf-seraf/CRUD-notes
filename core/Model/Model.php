@@ -25,7 +25,7 @@ abstract class Model
                 str_repeat('?, ', count($data)),
                 0,
                 -2
-            ) . ")";
+            ) . ")"; // insert into $table (k1, k2, k3) values (?, ?, ?)
         $stmt = static::$db->prepare($sql);
         $stmt->execute(array_values($data));
 

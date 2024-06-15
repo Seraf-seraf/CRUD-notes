@@ -13,8 +13,8 @@ Database::getInstance()
     );
 
 $content = '';
+session_start();
 Post::init();
 $postController = new PostController();
 $authController = new AuthController();
 $router = new AltoRouter();
-session_start();
