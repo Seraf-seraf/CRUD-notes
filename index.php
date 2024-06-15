@@ -48,6 +48,8 @@ try {
     call_user_func_array($match['target'] ?? null, $match['params'] ?? null);
 } catch (InvalidArgumentException $exception) {
     $content = $exception->getMessage();
+} catch (Exception|Error $exception) {
+    $content = '404 Not found';
 }
 
 print render('core/View/layout.php', ['content' => $content]);

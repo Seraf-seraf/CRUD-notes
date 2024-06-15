@@ -29,8 +29,8 @@ class PostController extends Controller
                 exit();
             }
 
-            $title = htmlspecialchars($values['title']);
-            $note = htmlspecialchars($values['note']);
+            $title = $values['title'];
+            $note = $values['note'];
 
             Post::update(['title' => $title, 'note' => $note], $id);
             header('Location: /view/' . $id);
