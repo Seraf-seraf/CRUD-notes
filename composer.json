@@ -1,5 +1,5 @@
 {
-  "name": "notesapp/v1",
+  "name": "notesapp/v3",
   "autoload": {
     "psr-4": {
       "NotesApp\\": "core/"
@@ -12,6 +12,9 @@
     }
   ],
   "require": {
-    "altorouter/altorouter": "1.1.0"
+    "altorouter/altorouter": "1.1.0",
+    "mongodb/mongodb": "^1.19",
+    "ext-mongodb": "*",
+    "ext-redis": "*"
   }
 }

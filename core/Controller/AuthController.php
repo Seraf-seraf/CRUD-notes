@@ -2,6 +2,8 @@
 
 namespace NotesApp\Controller;
 
+use NotesApp\Database\Redis;
+use NotesApp\Handler\SessionHandler;
 use NotesApp\Model\User;
 
 class AuthController extends Controller
@@ -30,7 +32,9 @@ class AuthController extends Controller
                 $password = password_hash($values['password'], PASSWORD_BCRYPT);
                 $user = User::create(['login' => $login, 'password' => $password]);
 
-                $_SESSION['user_id'] = $user->id;
+                $sessionHandler = new SessionHandler();
+                $sessionHandler->createSession($user);
+
 
                 header('Location: /');
                 die();
@@ -51,10 +55,11 @@ class AuthController extends Controller
             }
             $login = $values['login'];
 
-            $user = User::find(['login' => $login]);
+            $user = User::find(['login' => $login])[0];
 
-            if ($user && password_verify($values['password'], $user->password)) {
-                $_SESSION['user_id'] = $user->id;
+            if ($user && password_verify($values['password'], $user['password'])) {
+                $sessionHandler = new SessionHandler();
+                $sessionHandler->createSession($user);
 
                 header('Location: /');
                 die();

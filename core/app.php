@@ -2,21 +2,17 @@
 
 use NotesApp\Controller\AuthController;
 use NotesApp\Controller\PostController;
-use NotesApp\Database\Database;
 use NotesApp\Model\Post;
+use NotesApp\Handler\SessionHandler;
+use NotesApp\Model\User;
 
-Database::getInstance()
-    ->connect(
-        'mysql:host=localhost;dbname=notesapp;charset=utf8',
-        'root',
-        ''
-    );
+$sessionHandler = new SessionHandler();
+$sessionHandler->checkSession();
+Post::init('notes-app');
+User::init('notes-app');
 
 $content = '';
-Post::init();
+
 $router = new AltoRouter();
-session_start();
 $postController = new PostController();
 $authController = new AuthController();
-
-

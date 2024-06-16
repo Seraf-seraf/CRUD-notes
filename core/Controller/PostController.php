@@ -9,13 +9,16 @@ class PostController extends Controller
 
     public function index()
     {
-        $posts = Post::findAll();
+        $posts = [];
+        foreach (Post::findAll() as $post) {
+            $posts[] = $post;
+        }
         return render('core/View/post/index.php', ['posts' => $posts]);
     }
 
     public function view($id)
     {
-        $post = Post::find(['id' => $id]);
+        $post = Post::find(['_id' => $id])[0];
         return render('core/View/post/view.php', ['post' => $post]);
     }
 
@@ -35,7 +38,7 @@ class PostController extends Controller
             Post::update(['title' => $title, 'note' => $note], $id);
             header('Location: /view/' . $id);
         }
-        $post = Post::find(['id' => $id]);
+        $post = Post::find(['_id' => $id])[0];
 
         return render('core/View/post/update.php', ['post' => $post]);
     }
@@ -59,9 +62,8 @@ class PostController extends Controller
             $title = htmlspecialchars($values['title']);
             $note = htmlspecialchars($values['note']);
 
-            $post = POST::create(['title' => $title, 'note' => $note]);
-
-            header('Location: /view/' . $post->id);
+            $post = POST::create(['title' => $title, 'note' => $note, 'date_created' => time()])[0];
+            header('Location: /view/' . $post['_id']);
         }
 
         return render('core/View/post/create.php');

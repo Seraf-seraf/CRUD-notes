@@ -1,8 +1,11 @@
 <?php
 /** @var AltoRouter $router */
 
-/** @var \NotesApp\Controller\PostController $postController */
-/** @var \NotesApp\Controller\AuthController $authController */
+/** @var PostController $postController */
+/** @var AuthController $authController */
+
+use NotesApp\Controller\AuthController;
+use NotesApp\Controller\PostController;
 
 require_once 'vendor/autoload.php';
 require_once 'helper/helper.php';
@@ -17,21 +20,21 @@ try {
         getAuth();
         $content = $postController->create();
     });
-    $router->map('GET|POST', '/update/[i:id]', function ($id) use ($postController, &$content) {
+    $router->map('GET|POST', '/update/[a:id]', function ($id) use ($postController, &$content) {
         getAuth();
         $content = $postController->update($id);
     });
-    $router->map('GET', '/delete/[i:id]', function ($id) use ($postController, &$content) {
+    $router->map('GET', '/delete/[a:id]', function ($id) use ($postController, &$content) {
         getAuth();
         $postController->delete($id);
     });
     $router->map('GET', '/logout', function () {
         getAuth();
-        unset($_SESSION['user_id']);
+        $redis->select();
         header('Location: /');
     });
 
-    $router->map('GET', '/view/[i:id]', function ($id) use ($postController, &$content) {
+    $router->map('GET', '/view/[a:id]', function ($id) use ($postController, &$content) {
         $content = $postController->view($id);
     });
 
@@ -44,12 +47,12 @@ try {
     });
 
     $match = $router->match();
-
     call_user_func_array($match['target'] ?? null, $match['params'] ?? null);
 } catch (InvalidArgumentException $exception) {
     $content = $exception->getMessage();
 } catch (Exception|Error $exception) {
-    $content = '404 Not found';
+    $content = 'Page not found';
 }
+
 
 print render('core/View/layout.php', ['content' => $content]);

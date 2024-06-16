@@ -3,18 +3,14 @@
 namespace NotesApp\Model;
 
 use NotesApp\Database\Database;
+use NotesApp\Database\MongoDatabase;
 
-class Post extends Model
+class Post extends MongoModel
 {
     public static array $fillable = [
         'title',
         'note'
     ];
-    protected static $table = 'post';
 
-    public function __construct()
-    {
-        static::$db = Database::getInstance()->db;
-    }
-
+    protected static $collection = 'post';
 }
